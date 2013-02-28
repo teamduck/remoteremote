@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title>remoteremote.com</title>
+		<meta name="description" content="Share videos with friends and stuff.">
+		<meta property="og:title" content="remoteremote">
+		<meta property="og:type" content="website">
+		<meta property="og:description" content="Share videos with friends and stuff.">
+		<meta property="og:url" content="http://sam.no.de/">
+		<meta property="og:image" content="http://sam.no.de/external_icon.png">
+		<meta property="fb:admins" content="1249065843">
+		
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="tipTip.css">
+		<!--<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">-->
+		<!--<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css">-->
+		<!--<script src="http://cdn.socket.io/stable/socket.io.js"></script>-->
+		<script src="/socket.io/socket.io.js"></script>
+		<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>-->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
+		<!--<script type="text/javascript" src="http://craigsworks.com/projects/qtip/packages/1.0.0-rc3/jquery.qtip-1.0.0-rc3.js"></script> -->
+		<script type="text/javascript" src="jquery.tipTip.minified.js"></script> 
+		<script src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+		<script src="client.js"></script>
+	</head>
+	<!-- should this be purple or green? -->
+	<body>
+		<div id="HeightContainer">
+			<div id="Site">
+				<div id="Top">
+					<a href="/"><img src='logo.png'></a>
+				</div>	
+				
+				<div id="Content">
+					<div id="intro_text">
+						<div id="big_logo_glow"></div>
+						<div id="big_logo"></div>
+						Welcome to Remote Remote! Here you can hang out with friends or strangers.
+						<div id="what_is">
+							<div id="what_is_arrow" class="what_is_arrow_down"></div>
+						</div>
+						<div id="what_is_text">
+							Just join a room and you can send the link to your friends.
+							Watch something with them while you talk.
+							You can mash your room to meet new people, or split if they're harshing your mellow.
+						</div>
+					</div>
+
+					<div id="join_room_buttons">
+						<a href="#" id="join_random_button">
+							<img src='join.png'>
+						</a>
+					</div>
+					
+					<div id="popular_rooms"></div>
+					
+					<div id="connecting">Connecting...</div>
+					<div id="connection_error"></div>
+					
+					<div id="room_stuff">
+						<div id="top_panel_labels">
+							<a href="#" id="top_panel_label_1" onclick="toggle_panel(1); return false">other rooms</a> |
+							<a href="#" id="top_panel_label_2" onclick="toggle_panel(2); return false">room history</a> |
+							<a href="#" id="top_panel_label_3" onclick="toggle_panel(3); return false">actions</a> |
+							<a href="#" id="top_panel_label_4" onclick="toggle_panel(4); return false">search youtube</a> |
+							<a href="#" id="top_panel_label_5" onclick="toggle_panel(5); return false">client info</a>
+						</div>
+						<div id="room_parent">
+							<div id="top_panels">
+								<div id="top_panel_1" class="top_panel">no data loaded</div>
+								<div id="top_panel_2" class="top_panel">
+									<div id="room_history" class="top_pane_items"></div>
+								</div>
+								<div id="top_panel_3" class="top_panel"><img src="split.png"> <img src="mash.png"></div>
+								<div id="top_panel_4" class="top_panel">
+									<div id="search_youtube">
+										<br><br>Search<br>
+										<input type=text id="search_youtube_input">
+									</div>
+									<div id="search_youtube_results" class="top_pane_items"></div>
+								</div>
+								<div id="top_panel_5" class="top_panel"></div>
+							</div>
+							<div id="room">
+								<div id="user_list">&nbsp;</div>
+								<div id="video_pane">
+									<div id="video_title"></div>
+									<div id="video_pane_2">
+										<div id="ytapiplayer">
+											You need Flash player 8+ and JavaScript enabled to view this video.
+											<!--http://www.youtube.com/watch?v=u1zgFlCw8Aw-->
+										</div>
+									</div>
+									<div id="video_controls">
+										<div id="video_variable_controls"></div>
+										<div id="video_volume">
+											<div id="video_volume_slider"></div>
+											<div id="video_volume_label"></div>
+										</div>
+										<div id="video_hd_box">
+											<input type="checkbox" id="video_hd"><label for="video_hd" id="video_hd_label">HD</label>
+										</div>
+									</div>
+								</div>
+								<div id="chat">
+									<div id="room_title">
+										<div id="room_title_label"></div>
+										<input type="text" id="room_title_entry">
+									</div>
+									<div id="message_area"></div>
+									<input type="text" tabindex="1" id="chat_entry">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					
+				</div>	<!-- content -->	
+			</div>	<!-- site -->
+	
+			<div id="footer_background">
+
+				<div id="footer_text">
+					Copyright &copy; 2012 Team Duck. All rights reserved.
+					<div style="float:right; font-weight:bold">
+						&middot; <a href="#">Home</a>
+						&middot; <a href="#" id="footer_about">About</a>
+						<!--&middot; <a href="#" onclick="player_set_quality('default');return false">SD</a>
+						&middot; <a href="#" onclick="player_set_quality('hd720');return false">HD</a>-->
+					</div>
+					<div id="status">
+						<span id="connection_status">Disconnected.</span>
+						<span id="server_info"></span>
+						<span id="server_uptime"></span>
+						<span id="server_latency"></span>
+					</div>
+				</div>
+			</div>
+			
+		</div>	<!-- height container -->
+		
+	</body>
+</html>
+

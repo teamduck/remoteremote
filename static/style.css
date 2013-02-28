@@ -1,0 +1,565 @@
+/* General Style */
+
+html, body { height: 100%; }
+img { border-style: none; }
+a { text-decoration: none; }
+
+body {
+	font: 			12pt verdana, geneva, lucida, 'lucida grande', 
+					arial, helvetica, sans-serif;
+	line-height:		110%;
+	text-align: 		center;
+	background-color: 	#FFFFFF;
+	margin:			0 0 0 0;	
+	padding:		0 0 0 0;
+	color:			#000000;
+	background:		#FFFFFF url(bubbles.png) repeat-x top;
+}
+
+/* Height Preserving Container - Keeps Page At Least As Tall As the Window */
+#HeightContainer {
+	height:			auto;
+	min-height: 		100%;
+	position: 		relative;
+}
+
+/* Main Containing Class - Keeps Page Width Reasonable */
+#HeightContainer #Site {
+	/*	Center the Page */
+	width: 			1024px;
+	margin: 		0 auto;
+	text-align: 		left;
+	background:		#FFFFFF url(bar.png) repeat-x top;
+}
+
+/* Positional Formatting for the Top Title & Navigation Bar */
+#HeightContainer #Site #Top {
+	/* Positioning */
+	margin: 		0 0 0 0;
+	padding:		10px 10px 30px 10px;
+	width:			1024px;
+	height:			48px;
+
+	/* Title Formatting */
+	color:			#FFFFFF;
+	text-align: 		left;
+	font-weight:		bold;
+	font-size:		14pt;
+	
+	line-height:		100%;	
+}
+
+#Content {
+	width:			auto;
+	padding:		10px 10px 74px 10px;	
+	margin-left:		0;
+	margin-right:		0;
+	margin-top:		0;
+	margin-bottom:		0;
+
+	background-color: 	#FFFFFF;
+	color:			#000000;
+	
+	text-align: center;
+}
+
+#container {
+	width:			1004px;
+	height:			602px;
+}
+
+#big_logo_glow {
+	position: absolute;
+	width: 1004px;
+	height: 79px;
+	background: url(biglogo_glow_4.png) center top no-repeat;
+	z-index: 1;
+	opacity: 0;
+}
+#big_logo {
+	/* http://www.dafont.com/harabara.font?text=remote+remote */
+	position: relative;
+	background: url(biglogo.png) center top no-repeat;
+	height: 79px;
+	margin-top: 50px;
+	margin-bottom: 20px;
+	z-index: 2;
+}
+
+#what_is {
+	height: 17px;
+	background: url(whatis.png) 20px top no-repeat;
+	margin: 0 100px;
+	margin-top: 20px;
+	cursor: pointer;
+}
+#what_is_arrow { height: 17px; }
+.what_is_arrow_right { background: url(icons.png) 0px 0px no-repeat; }
+.what_is_arrow_down { background: url(icons.png) 0px -17px no-repeat; }
+#what_is_text {
+	/*display: none;*/
+	margin: 10px 120px;
+	text-align: left;
+}
+
+#join_room_buttons { margin-top: 20px; }
+#join_room_buttons a { opacity: .9; margin: 10px 0; }
+#join_room_buttons a:hover { opacity: 1; }
+#join_room_buttons a:hover, #join_room_buttons a {
+	-webkit-transition: all .2s ease;
+	-moz-transition: all .2s ease;
+	-o-transition: all .2s ease;
+	transition: all .2s ease;
+}
+
+#popular_rooms {
+	margin: 20px 100px;
+	padding: 10px;
+	border-top: black 1px solid;
+	border-bottom: black 1px solid;
+	text-align: left;
+}
+
+#connecting { display: none; }
+#connection_error {
+	display: none;
+	color: white;
+	background: red;
+	padding: 5px;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+/*#intro_text { display: none; }*/
+
+#room_stuff { display: none; }
+
+#room_parent {
+	position:relative;
+	height: 680px;
+}
+
+#top_panels {
+	border: #777 2px solid;
+	-moz-border-radius-topleft: 10px;
+	-moz-border-radius-topright: 10px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom: none;
+	height: 180px;
+	position: absolute;
+	width: 100%;
+}
+
+.top_panel {
+	display: none;
+	height: 140px;
+	padding: 10px;
+	text-align: left;
+}
+
+#top_panel_labels {
+	margin: 2px 20px;
+	padding: 2px;
+	text-align: left;
+}
+
+#top_panel_labels a {
+	margin: 10px 0;
+	color: black;
+}
+
+#top_panel_labels a:hover {
+	background: #eee;
+}
+
+#top_panel_labels a.top_panel_label_selected {
+	background: #ddd;
+}
+
+#search_youtube {
+	float: left;
+	width: 150px;
+	height: 140px;
+	text-align: center;
+	border-right: black 1px solid;
+}
+#search_youtube_input {
+	width: 120px;
+}
+.top_pane_items {
+	overflow: auto;
+	height: 140px;
+	max-height: 140px;
+	margin-left: 5px;
+}
+.top_pane_items table { border-collapse: collapse; }
+.top_pane_items tr, td { margin: 0; padding: 0; vertical-align: top; }
+
+.pane_item {
+	display: block;
+	color: black;
+	height: 110px;
+	overflow: hidden;
+	margin: 0 5px;
+	padding: 5px;
+	font-size: 8pt;
+	border: #ddd 1px solid;
+	background: #f5f5f5;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+a.pane_item:hover {
+	background: #eee;
+}
+
+#search_youtube_results {
+	width: 820px;
+	float: left;
+}
+
+.youtube_result {
+	width: 128px;
+}
+.youtube_result img {
+	max-width: 128px;
+	height: 60px; /* yes this looks weird on non-widescreen images, deal with it */
+}
+
+#top_panel_5 {
+	line-height: 22px;
+}
+
+
+#room {
+	text-align: left;
+	border: black 2px solid;
+	background: white;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	position: absolute;
+	width: 100%;
+	/*top: 80px;*/
+	top: 0px;
+}
+
+/* widths of the panes */
+/* left */
+/*#user_list { width: 120px; }
+#chat { margin-left: 120px; }*/
+/* right */
+#video_pane {
+	width: 600px;
+}
+#video_pane_2 {
+	z-index:0;
+	position:relative;
+	background: black;
+}
+#chat { margin-right: 600px; }
+
+#user_list {
+	/*float: left;
+	height: 400px;
+	width: 100px;*/
+	border-bottom: black 1px solid;
+	padding: 10px;
+}
+
+#chat {
+	height: 430px;
+	padding: 0 10px;
+	/*background: #FFFFFF url(chatArea.png) 0 0 no-repeat;*/
+	/*border-left: black 1px solid;*/
+	border-right: black 1px solid;
+}
+
+#room_title {
+	height: 20px;
+	text-align: center;
+	background: url(room_title_seperator.png) center bottom no-repeat;
+	padding-top: 5px;
+	padding-bottom: 8px;
+	margin-bottom: 5px;
+}
+
+#room_title_label {
+	height: 20px;
+	line-height: 20px;
+	overflow: hidden;
+}
+
+.room_title_label_editable {
+	cursor: pointer;
+}
+div.room_title_label_editable:hover {
+	background: #eee;
+}
+
+#room_title_entry {
+	display: none;
+	width: 100%;
+	text-align: center;
+}
+
+#message_area {
+	height:			340px;
+	overflow:		auto;
+	font-size:		10pt;
+	border-bottom: #ccc 1px solid;
+	margin-bottom: 10px;
+}
+
+#chat_entry {
+	width: 100%;
+	margin: 0px;
+	margin-left: -1px;
+	height: 26px;
+	line-height: 26px;
+	outline-width: 0;
+	border: #ccc 1px solid;
+	font-size: 10pt;
+}
+
+#video_pane {
+	height: 430px;
+	float: right;
+}
+
+#video_title {
+	height: 30px;
+	line-height: 30px;
+	font-size: 16pt;
+	padding: 0 30px;
+	color: #333;
+	font-weight: bold;
+	overflow: hidden;
+}
+
+#video_controls {
+	height: 38px;
+	margin: 10px 15px;
+}
+
+#video_volume {
+	float: left;
+	width: 80px;
+	margin: 0 15px;
+}
+#video_volume_slider {
+	margin-top: 5px;
+}
+#video_volume_label {
+	text-align: center;
+	font-size: 8pt;
+}
+
+#video_hd_box {
+	float: left;
+	width: 80px;
+	font-size: 8pt;
+	margin: 5px 15px;
+}
+
+#video_variable_controls {
+	float: left;
+}
+
+#video_progress {
+	float: right;
+	width: 250px;
+	margin: 5px 15px;
+	height: 38px;
+}
+#video_progress_bar {
+	height: 14px;
+}
+#video_progress_label {
+	font-size: 8pt;
+}
+#video_progress_label_2 {
+	float: right;
+}
+
+#video_next {
+	
+}
+#video_pause, #video_next {
+	float: left;
+	margin: 0 15px;
+	width: 36px;
+	height: 36px;/*
+	background: white url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/playback_pause.png) center center no-repeat;
+	border: black 1px solid;
+	border-radius: 3px;
+	cursor: pointer;*/
+}
+/*
+button#video_pause:hover {
+	background-color: #eee;
+}*/
+
+
+#HeightContainer #footer_background  {
+	/*	Positioning */
+	position: 		absolute;
+	bottom:	 		0px;
+	left:		 	0px;
+	right:			0px;		
+	height:			64px;
+	margin-left:		auto;
+	margin-right:		auto;
+	margin-top:		0;
+	margin-bottom:		0;
+/*	min-width:		1024px;
+	width:			100%;*/
+	width:			1024px;
+	
+	padding:		0px 0px 0px 0px;	
+
+	/*	Background */
+	background-position: 	0% 0%;
+	border-top: 		1px solid #A4ADB9;
+}
+
+#HeightContainer #footer_background #ValidIcon {
+	float:			right;
+	margin:			0px 10px 10px 0;
+}
+
+#HeightContainer #footer_background #footer_text {
+	position:		relative;
+	text-align:		left;
+	font-weight:		normal;
+	font-size:		8pt;
+	color:			#36393D;
+	width:			780px;
+	margin:			10px auto;
+	padding:		0px 10px 0px 10px;
+}
+
+#footer_text a {
+	margin-right: 20px;
+}
+
+/* Text Formats */
+h1 {
+	font-weight:		bold;
+	font-size:		18pt;
+	text-align:		center;	
+}
+
+h2 {
+	font-weight:		bold;
+	font-size:		16pt;	
+}
+
+h3 {
+	font-weight:		bold;
+	font-size:		12pt;
+	line-height:		80%;		
+}
+
+/* user names */
+.user_dropdown_container { position:relative; }
+.user {/*background-color: white;*/}
+.user_you {
+	/*border: #ccc 1px solid;*/
+	/*background-color: #ddd;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	padding: 2px;*/
+	font-weight: bold;
+	font-style: italic;
+}
+.has_remote {
+	padding-left: 12px;
+	background-image: url(remote.png);
+	background-position: left center;
+	background-repeat: no-repeat;
+}
+/* colors */
+.red { color: #F40233; }
+.green { color: #00A000; }
+.blue { color: #0000FF; }
+.purple { color: #900090; }
+.orange { color: #FF7F00; }
+
+/* the dropdown menu for the user */
+.user_dropdown {
+	display: none;
+	position: absolute;
+	top: 18px;
+	width: 150px;
+	background: #f5f5f5;
+	border: #000 1px solid;
+	border-top: none;
+	padding-top: 10px;
+	
+	-webkit-border-radius: 5px;
+	-webkit-border-top-left-radius: 0;
+	-moz-border-radius: 5px;
+	-moz-border-radius-topleft: 0;
+	border-radius: 5px;
+	border-top-left-radius: 0;
+}
+.user_dropdown a {
+	display: block;
+	color: black;
+	padding: 5px;
+}
+.user_dropdown a:hover {
+	background: black;
+	color: white;
+}
+.user_dropdown_clickable {
+	padding-right: 9px;
+}
+.user_dropdown_clickable:hover {
+	background: url(icons.png) right -52px no-repeat;
+}
+.user_dropdown_clickable .user {
+	cursor: pointer;
+}
+/*
+.user_dropdown_container:hover .user_dropdown {
+	display: block !important;
+}*/
+
+.notice {
+	opacity: .8;
+	font-style: italic;
+	color: #444444;
+}
+
+.play_icon {
+	background: url(icons.png) 0 -35px no-repeat;
+	width: 16px;
+	height: 16px;
+	position: relative;
+	top: 1px;
+	display: inline-block;
+	zoom: 1;
+	*display: inline;
+}
+table.room_listing {
+	width: 100%;
+	border-collapse: collapse;
+}
+table.room_listing td {
+	padding: 2px;
+}
+.table_row_even {
+	background: #eee;
+}
+.room_empty {
+	color: #888;
+}
+.emoticon {
+	display: inline-block;
+	zoom: 1;
+	*display: inline;
+}
+

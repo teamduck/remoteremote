@@ -1,0 +1,3 @@
+nohup nice node server.js&
+exit
+

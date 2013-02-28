@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+	<head>
+		<title>remoteremote status</title>
+		<style>
+			div#main {
+				margin: 0 auto;
+				width: 800px;
+			}
+			div#info { margin: 10px 0; }
+			#console { margin: 10px 0; }
+			input#input {
+				display: block;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>remoteremote status</h1>
+		<hr>
+		<div id="main">
+			<h2>info</h2>
+			<div id="info">{{info}}</div>
+			<hr>
+			<h2>console</h2>
+			<pre id="console">{{console}}</pre>
+			<form action="/status" method="post">
+				<input type=text name=input id=input>
+				auth: <input type=password name=auth value="{{auth}}">
+				<button type=submit>submit</button>
+			</form>
+		</div>
+	</body>
+</html>
