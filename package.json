@@ -1,0 +1,28 @@
+{
+  "name": "remoteremote",
+  "version": "1.0.0",
+  "description": "Remote video sharing chat application.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "socketio": "*",
+    "memcached": "*"
+  },
+  "dependencies": {
+    "socketio": "*",
+    "memcached": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teamduck/remoteremote.git"
+  },
+  "author": "Team Duck",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/teamduck/remoteremote/issues"
+  },
+  "homepage": "https://github.com/teamduck/remoteremote#readme"
+}

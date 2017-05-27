@@ -1,7 +1,9 @@
 //events = require('events');
+//net = require('net');
+//nMemcached = require('./3rd-Eden-node-memcached/nMemcached');
+
 sys = require('util');
 http = require('http');
-//net = require('net');
 crypto = require('crypto');
 url = require('url');
 querystring = require('querystring');
@@ -12,10 +14,13 @@ try {
 } catch(e) {
 	gzip = undefined;
 }
-//nMemcached = require('./3rd-Eden-node-memcached/nMemcached');
-nMemcached = require('memcached');
-Constants = require('Constants');
 
+nMemcached = require('memcached');
+//Constants = require('Constants');
+Constants = {
+	"STATUS_AUTH_SHA1": "0",
+	"YOUTUBE_API_KEY": ""
+}
 
 
 //constants
@@ -24,7 +29,7 @@ DEBUG = true;
 DEBUG_TO_FILE = false;
 DEBUG_FILE = "out.txt"; //warning, this goes inside the static dir, so it can be served over http
 DEBUG_EVENTS = false;
-PORT = 80;
+PORT = 8080;
 CACHE_TYPE = "memcache"; //can be "memcache", "file", or "none". this is where HTTP requests are cached
 USE_NONE_MATCH = true; //whether to use the If-None-Match http header
 LIMIT_MSGS_PER_SEC = 5;
