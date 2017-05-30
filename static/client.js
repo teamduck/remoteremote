@@ -866,7 +866,7 @@ function reconnect() {
 	if (socket.connected || disconnect) return;
 	//socket.disconnect();
 	//socket.connect();
-	socket = io.connect("http://"+window.location.hostname);
+	socket = io.connect();
 	if(yourSession != undefined) {
 		send_event("resume_session", {sess_id:yourSession});
 	} else {
@@ -936,7 +936,7 @@ function init() {
 
 	// socket.io stuff
 	//socket = new io.Socket("sam.no.de", {rememberTransport: false, transports:['websocket', 'flashsocket', 'htmlfile', 'xhr-multipart', 'xhr-polling']});
-	socket = io.connect("http://"+window.location.hostname);
+	socket = io.connect();
 	socket.on('connect', function() {
 		announce("Connected via transport "+last_transport_attempted+".");
 		$("#connection_status").text("Connected via "+last_transport_attempted+".");

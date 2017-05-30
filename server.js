@@ -2,7 +2,6 @@
 //net = require('net');
 //nMemcached = require('./3rd-Eden-node-memcached/nMemcached');
 
-sys = require('util');
 http = require('http');
 crypto = require('crypto');
 url = require('url');
@@ -19,7 +18,6 @@ nMemcached = require('memcached');
 //Constants = require('Constants');
 Constants = {
 	"STATUS_AUTH_SHA1": "0",
-	"YOUTUBE_API_KEY": ""
 }
 
 
@@ -29,13 +27,13 @@ DEBUG = true;
 DEBUG_TO_FILE = false;
 DEBUG_FILE = "out.txt"; //warning, this goes inside the static dir, so it can be served over http
 DEBUG_EVENTS = false;
-PORT = 8080;
+PORT = process.env.PORT || 8080;
 CACHE_TYPE = "memcache"; //can be "memcache", "file", or "none". this is where HTTP requests are cached
 USE_NONE_MATCH = true; //whether to use the If-None-Match http header
 LIMIT_MSGS_PER_SEC = 5;
 LIMIT_MAX_BUCKET_SIZE = 10;
 //api key is optional, set to undefined if unused
-YOUTUBE_API_KEY = Constants.YOUTUBE_API_KEY;
+YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || "";
 CHANNELS = {
 	//lolcats:{title:"not funny", fetch:[{type:"cat", cat:"lolcat"}]},
 	//fitness:{title:"just some girl", type:"cat", cat:"fitness"},
@@ -542,7 +540,7 @@ User.prototype.pack = function() {
 
 function debug(str) {
 	if(DEBUG) {
-		sys.puts(str);
+		console.log(str);
 		if(DEBUG_TO_FILE) {
 			if(debug_fd === null)
 				debug_fd = fs.openSync("static/"+DEBUG_FILE, "w");
@@ -1365,20 +1363,20 @@ if(CACHE_TYPE == "memcache") {
 	mc = new nMemcached("localhost:11211");
 }
 
-sys.puts("Creating HTTP server on port "+PORT+".");
+console.log("Creating HTTP server on port "+PORT+".");
 var server = http.createServer(request_handler);
 server.listen(PORT);
 
-sys.puts("Setting up socket.io.");
+console.log("Setting up socket.io.");
 var socket = io.listen(server, {flashPolicyServer:true, log:debug}); 
 socket.sockets.on('connection', socket_io_handler);
 
-sys.puts("Done, ready to connect!");
+console.log("Done, ready to connect!");
 
 if(CACHE_TYPE == "file") {
 	try {
 		var cache_files = fs.readdirSync("cache");
-		sys.puts("init: " + cache_files.length + " files in cache");
+		console.log("init: " + cache_files.length + " files in cache");
 	} catch(e) {}
 }
 	setTimeout(remove_old_cache_files, 200);
