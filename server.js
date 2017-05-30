@@ -18,7 +18,6 @@ nMemcached = require('memcached');
 //Constants = require('Constants');
 Constants = {
 	"STATUS_AUTH_SHA1": "0",
-	"YOUTUBE_API_KEY": "",
 }
 
 
@@ -28,13 +27,13 @@ DEBUG = true;
 DEBUG_TO_FILE = false;
 DEBUG_FILE = "out.txt"; //warning, this goes inside the static dir, so it can be served over http
 DEBUG_EVENTS = false;
-PORT = 8080;
+PORT = process.env.PORT || 8080;
 CACHE_TYPE = "memcache"; //can be "memcache", "file", or "none". this is where HTTP requests are cached
 USE_NONE_MATCH = true; //whether to use the If-None-Match http header
 LIMIT_MSGS_PER_SEC = 5;
 LIMIT_MAX_BUCKET_SIZE = 10;
 //api key is optional, set to undefined if unused
-YOUTUBE_API_KEY = Constants.YOUTUBE_API_KEY;
+YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || "";
 CHANNELS = {
 	//lolcats:{title:"not funny", fetch:[{type:"cat", cat:"lolcat"}]},
 	//fitness:{title:"just some girl", type:"cat", cat:"fitness"},
