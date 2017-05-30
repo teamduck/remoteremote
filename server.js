@@ -2,7 +2,6 @@
 //net = require('net');
 //nMemcached = require('./3rd-Eden-node-memcached/nMemcached');
 
-sys = require('util');
 http = require('http');
 crypto = require('crypto');
 url = require('url');
@@ -19,7 +18,7 @@ nMemcached = require('memcached');
 //Constants = require('Constants');
 Constants = {
 	"STATUS_AUTH_SHA1": "0",
-	"YOUTUBE_API_KEY": ""
+	"YOUTUBE_API_KEY": "",
 }
 
 
@@ -542,7 +541,7 @@ User.prototype.pack = function() {
 
 function debug(str) {
 	if(DEBUG) {
-		sys.puts(str);
+		console.log(str);
 		if(DEBUG_TO_FILE) {
 			if(debug_fd === null)
 				debug_fd = fs.openSync("static/"+DEBUG_FILE, "w");
@@ -1365,20 +1364,20 @@ if(CACHE_TYPE == "memcache") {
 	mc = new nMemcached("localhost:11211");
 }
 
-sys.puts("Creating HTTP server on port "+PORT+".");
+console.log("Creating HTTP server on port "+PORT+".");
 var server = http.createServer(request_handler);
 server.listen(PORT);
 
-sys.puts("Setting up socket.io.");
+console.log("Setting up socket.io.");
 var socket = io.listen(server, {flashPolicyServer:true, log:debug}); 
 socket.sockets.on('connection', socket_io_handler);
 
-sys.puts("Done, ready to connect!");
+console.log("Done, ready to connect!");
 
 if(CACHE_TYPE == "file") {
 	try {
 		var cache_files = fs.readdirSync("cache");
-		sys.puts("init: " + cache_files.length + " files in cache");
+		console.log("init: " + cache_files.length + " files in cache");
 	} catch(e) {}
 }
 	setTimeout(remove_old_cache_files, 200);
