@@ -123,11 +123,11 @@ function prettyDate(date) {
 
 
 // functions for the api calls
-var yt_player_ready = false;
 var yt_player_queue = {}; //queues a video to play when the player is done initial loading
 var yt_player_progress_type = null; //0 = progress bar, 1 = slider
 var yt_player_progress_target;
 var yt_player_user_seeking = false;
+var yt_player_ready = false;
 
 function init_youtube_player() {
 
@@ -139,100 +139,90 @@ function init_youtube_player() {
 }
 
 // This function creates an <iframe> (and YouTube player) after the API code downloads.
-var player;
+var yt_player;
 function onYouTubeIframeAPIReady() {
-	player = new YT.Player('player', {
+	yt_player = new YT.Player('player', {
 		height: Math.floor(600*365/640),
 		width: 600,
 		videoId: 'M7lc1UVf-VE',
 		events: {
 			'onReady': onPlayerReady,
-			'onStateChange': onPlayerStateChange
-		}
+			'onStateChange': onPlayerStateChange,
+			'onError': onYoutubePlayerError,
+		},
+		playerVars: { 
+			'autoplay': 1, 
+			'controls': 0,
+			'fs' : 0,
+			'playsinline' : 1,
+			'rel' : 0,
+			'showinfo' : 0,
+			'enablejsapi': 1,
+			'disablekb' : 1,
+		},
 	});
+
 }
 
 // The API will call this function when the video player is ready.
 function onPlayerReady(event) {
-	event.target.playVideo();
+	yt_player_ready = true;
+
+	if(yt_player_queue.id != undefined) {
+                player_put_video(yt_player_queue.id, yt_player_queue.start_time, yt_player_queue.play);
+        }
+
+	player_build_controls();
+        var vol_label = $("#video_volume_label");
+        vol_label.text("vol: " + yt_player.getVolume() + "%");
+        $("#video_volume_slider")
+                .slider("option", "value", yt_player.getVolume())
+                .bind('slide', function(event, ui) {
+                        yt_player.setVolume(ui.value);
+                        vol_label.text("vol: " + yt_player.getVolume() + "%");
+                });
+        setInterval(function() {
+                //dont update if duration is 0 or no progress bar loaded or buffering
+                var player_state = yt_player.getPlayerState();
+                if(yt_player.getDuration() == 0 || yt_player_progress_type===null || player_state==3) return;
+                var current_time = yt_player.getCurrentTime();
+                var duration = yt_player.getDuration();
+                var value = 100 * current_time / duration;
+
+                if(yt_player_progress_type === 0) {
+                        yt_player_progress_target.progressbar("option", "value", value);
+                } else if(yt_player_progress_type === 1 && !yt_player_user_seeking) {
+                        yt_player_progress_target.slider("option", "value", value);
+                        $("#video_progress_bar .ui-slider-range-min")
+                                .css("width", Math.floor(loaded_percent*100)+"%")
+                                .css("left", Math.floor(start_percent*100)+"%");
+                }
+                var bar_parent = yt_player_progress_target.parent();
+                var label1 = Math.floor(current_time);
+                var label2 = Math.floor(duration);
+                if(label1 == -1) label1 = 0;
+                if(label2 == -1) label2 = 0;
+                //format into minutes and stuff
+                label1 = format_minutes(label1);
+                label2 = format_minutes(label2);
+                $("#video_progress_label_1", bar_parent).text(label1);
+                $("#video_progress_label_2", bar_parent).text(label2);
+        }, 200);
+        setInterval(send_client_info, CLIENT_INFO_INTERVAL);
+
 }
 
 // The API calls this function when the player's state changes.
-//    The function indicates that when playing a video (state=1),
-//    the player should play for six seconds and then stop.
 function onPlayerStateChange(event) {
-	if (event.data == YT.PlayerState.PLAYING && !done) {
-		setTimeout(stopVideo, 6000);
-	}
+	if(event.data == yt_player.PlayerState.BUFFERING && !player_quality_set && false) { //is now a param in cuevideobyid
+                player_set_quality();
+                player_quality_set = true;
+        }
+
 }
       
 function stopVideo() {
-	player.stopVideo();
-}
-
-function onYouTubePlayerReady(x) {
-	yt_player_ready = true;
-	ytplayer = document.getElementById("myytplayer");
-	ytplayer.addEventListener("onError", "onYoutubePlayerError");
-	if(yt_player_queue.id != undefined) {
-		player_put_video(yt_player_queue.id, yt_player_queue.start_time, yt_player_queue.play);
-	}
-	player_build_controls();
-	var vol_label = $("#video_volume_label");
-	vol_label.text("vol: " + ytplayer.getVolume() + "%");
-	$("#video_volume_slider")
-		.slider("option", "value", ytplayer.getVolume())
-		.bind('slide', function(event, ui) {
-			ytplayer.setVolume(ui.value);
-			vol_label.text("vol: " + ytplayer.getVolume() + "%");
-		});
-	setInterval(function() {
-		//dont update if duration is 0 or no progress bar loaded or buffering
-		var player_state = ytplayer.getPlayerState();
-		if(ytplayer.getDuration() == 0 || yt_player_progress_type===null || player_state==3) return;
-		var current_time = ytplayer.getCurrentTime();
-		var duration = ytplayer.getDuration();
-		var value = 100 * current_time / duration;
-		//calc the loaded bar
-		var total_bytes = ytplayer.getVideoBytesTotal();
-		var start_bytes = ytplayer.getVideoStartBytes();
-		var loaded_bytes = ytplayer.getVideoBytesLoaded();
-		var loaded_percent =  0;
-		var start_percent = 0;
-		if(total_bytes != 0) {
-			loaded_percent = loaded_bytes / (total_bytes);
-			start_percent = start_bytes / total_bytes;
-		}
-		
-		if(yt_player_progress_type === 0) {
-			yt_player_progress_target.progressbar("option", "value", value);
-		} else if(yt_player_progress_type === 1 && !yt_player_user_seeking) {
-			yt_player_progress_target.slider("option", "value", value);
-			//yt_player_progress_target.slider("option", "disabled", !(player_state==1||player_state==2||player_state==3));
-			$("#video_progress_bar .ui-slider-range-min")
-				.css("width", Math.floor(loaded_percent*100)+"%")
-				.css("left", Math.floor(start_percent*100)+"%");
-		}
-		var bar_parent = yt_player_progress_target.parent();
-		var label1 = Math.floor(current_time);
-		var label2 = Math.floor(duration);
-		if(label1 == -1) label1 = 0;
-		if(label2 == -1) label2 = 0;
-		//format into minutes and stuff
-		label1 = format_minutes(label1);
-		label2 = format_minutes(label2);
-		$("#video_progress_label_1", bar_parent).text(label1);
-		$("#video_progress_label_2", bar_parent).text(label2);
-	}, 200);
-	setInterval(send_client_info, CLIENT_INFO_INTERVAL);
-	ytplayer.addEventListener("onStateChange", "onStateChange");
-}
-
-function onStateChange(s) {
-	if(s==3 /*3=buffering*/ && !player_quality_set && false) { //is now a param in cuevideobyid
-		player_set_quality();
-		player_quality_set = true;
-	}
+	yt_player.stopVideo();
 }
 
 function onYoutubePlayerError(code) {
@@ -252,12 +242,12 @@ function format_minutes(seconds) {
 //can return a floating point value
 function player_get_time() {
 	if(!yt_player_ready) return 0;
-	return ytplayer.getCurrentTime();
+	return yt_player.getCurrentTime();
 }
 //can return a floating point value
 function player_get_duration() {
 	if(!yt_player_ready) return 0;
-	return ytplayer.getDuration();
+	return yt_player.getDuration();
 }
 
 function player_build_controls() {
@@ -311,8 +301,8 @@ function player_build_controls() {
 	}
 }
 
+//TODO
 // actually play it
-//looks like it loads it too?
 function player_put_video(id, start_time, play) {
 	if(_player_put_timeout != undefined)
 		clearTimeout(_player_put_timeout);
@@ -324,15 +314,15 @@ function player_put_video(id, start_time, play) {
 		yt_player_queue = {id:id, start_time:start_time, play:play};
 		return;
 	}
-	//var ytplayer = document.getElementById("myytplayer");
 	_player_put(id, start_time, play, 0);
 }
+
 function _player_put(id, start_time, play, attempt_num) {
 	try { //"Error calling method on NPObject."
 		player_quality_set = false;
-		ytplayer.cueVideoById(id, start_time, player_quality);
+		yt_player.cueVideoById(id, start_time, player_quality);
 		if(play)
-			ytplayer.playVideo();
+			yt_player.playVideo();
 	} catch(e) {
 		debug("setting the video threw: "+e);
 		if(attempt_num++ > 10)
@@ -340,6 +330,7 @@ function _player_put(id, start_time, play, attempt_num) {
 		_player_put_timeout = setTimeout(_player_put, 200, id, start_time, play, attempt_num);
 	}
 }
+
 //both params are optional
 function player_change_state(play, start_time) {
 	if(!yt_player_ready) {
@@ -348,16 +339,15 @@ function player_change_state(play, start_time) {
 		if(start_time !== undefined)
 			yt_player_queue.start_time = start_time;
 	} else {
-		//var ytplayer = document.getElementById("myytplayer");
 		if(start_time !== undefined) { //TODO: look at the distance to see if this is worth it
-			ytplayer.seekTo(start_time, true);
+			yt_player.seekTo(start_time, true);
 		}
 		if(play !== undefined) {
-			var state = ytplayer.getPlayerState();
+			var state = yt_player.getPlayerState();
 			if(play && state == 2) {
-				ytplayer.playVideo();
+				yt_player.playVideo();
 			} else if(!play && state == 1) {
-				ytplayer.pauseVideo();
+				yt_player.pauseVideo();
 			}
 		}
 	}
@@ -368,10 +358,9 @@ function player_stop() {
 		yt_player_queue = {};
 		return;
 	}
-	//var ytplayer = document.getElementById("myytplayer");
-	ytplayer.stopVideo();
-	ytplayer.clearVideo();
+	yt_player.stopVideo();
 }
+
 function player_set_quality(q) {
 	if(q != undefined)
 		player_quality = q;
@@ -386,6 +375,7 @@ function give_remote(id) {
 	if(yourRemote)
 		send_event("give_remote", {to_sess_id: id});
 }
+
 function change_name(name) {
 	if(name == undefined || name == "") return;
 	if(validName(name))
@@ -445,7 +435,6 @@ function build_user_list() {
 	}
 	var html = "users: " + list.join(", ");
 	$("#user_list").html(html);
-	//$("#user_list .user").removeClass("has_remote");
 	$("#user_list .user_sess_"+remoteSessId).addClass("has_remote");
 	$("#user_list .user_sess_"+yourSession).addClass("user_you");
 	$(".user_dropdown_clickable").click(function() {
@@ -455,6 +444,7 @@ function build_user_list() {
 		$(".user_dropdown", this).hide();
 	});
 }
+
 function set_room_title(title) {
 	room_title = title;
 	
@@ -558,10 +548,11 @@ function sendMessage() {
 	// clear it
 	$("#chat_entry").attr("value", "");
 }
-
+//TODO
 function set_video(x) {
 	send_event('msg', {msg: "http://youtube.com/watch?v="+x});
 }
+
 function announce_playing(title) {
 	video_title = title;
 	$("#video_title").html(video_title);
@@ -819,7 +810,7 @@ function toggle_panel(x) {
 			$('#search_youtube_input').focus();
 	}
 }
-
+//TODO
 function search_youtube() {
 	$.ajax({
 		type:"GET",
