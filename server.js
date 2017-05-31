@@ -923,7 +923,6 @@ routes['msg'] = function(user, data) {
 	if(msg==undefined || msg.length==0 || msg.length > MAX_MSG_LEN)
 		return user.send("msg_bad");
 	
-	//user.send("msg_ok", {msg: msg});
 	
 	//automatically link links
 	var msg_html = htmlspecialchars(msg);
