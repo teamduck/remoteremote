@@ -310,7 +310,7 @@ Room.prototype.set_video = function(video, info) {
 		var path = "/youtube/v3/videos?part=contentDetails,snippet&id=" + 
 			video + 
 			"&key=" +
-			"AIzaSyCQGx8DMc-bU2aui2_5NkMy953wmPRjsXE";
+			YOUTUBE_API_KEY;
 		http_get(host, path, function(body, status_code) {
 
 			debug(body);
