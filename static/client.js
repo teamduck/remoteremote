@@ -127,7 +127,7 @@ var yt_player_queue = {}; //queues a video to play when the player is done initi
 var yt_player_progress_type = null; //0 = progress bar, 1 = slider
 var yt_player_progress_target;
 var yt_player_user_seeking = false;
-var yt_player_ready = false;
+var yt_player_ready = true;
 
 function init_youtube_player() {
 

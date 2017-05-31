@@ -306,20 +306,22 @@ Room.prototype.set_video = function(video, info) {
 	} else {
 		//fetch the video info
 		var this_room = this;
-		http_get("gdata.youtube.com","/feeds/api/videos/"+video, function(body, status_code) {
-			//find the video title
-			// <title type='text'>adsf</title>
-			var title = body.match(/<title type='text'>([^<]+)<\/title>/);
-			if(title != null && typeof(title)=='object' && title[1] != undefined) {
-				title = title[1];
-			} else {
+		var host = "www.googleapis.com";
+		var path = "/youtube/v3/videos?part=contentDetails,snippet&id=" + 
+			video + 
+			"&key=" +
+			"AIzaSyCQGx8DMc-bU2aui2_5NkMy953wmPRjsXE";
+		http_get(host, path, function(body, status_code) {
+
+			debug(body);
+			var title = "fake title"; //body.items[0].snippet.title
+
+			if(title == null) {
 				title = "[error fetching title]";
 			}
 			//find the duration
-			var duration = body.match(/duration='([0-9]+)'/);
-			if(duration != null && typeof(duration)=='object' && duration[1] != undefined) {
-				duration = duration[1];
-			} else {
+			var duration = 60; //body.items[0].contentDetails.duration
+			if(duration == null) {
 				duration = -1;
 			}
 			this_room.send("video_info", {title:title});
@@ -402,8 +404,6 @@ Room.prototype.video_elapsed_time = function() {
 //begin loading videos from yuotube to play in a queue
 Room.prototype.channel_init = function() {
 	//load CHANNEL_VIDEOS videos
-	//http://gdata.youtube.com/feeds/api/videos?category=Lolcat&max-results=50&v=2&alt=jsonc
-	//http://gdata.youtube.com/feeds/api/users/EpicMealTime/uploads?v=2&alt=jsonc&max-results=50
 	setTimeout(this.channel_get_videos, Math.floor(Math.random()*5000), this);
 }
 Room.prototype.channel_get_videos = function(room) {
@@ -716,10 +716,11 @@ function http_get_nocache(host, path, callback, cache_key) {
 		method:"GET", 
 		path:path
 	}; 
-	if(YOUTUBE_API_KEY != undefined && options.host.indexOf("gdata.youtube.com")!=-1) {
+	if(YOUTUBE_API_KEY != undefined && options.host.indexOf("googleapis.com")!=-1) {
 		debug("sending API key..");
 	}
-	try {
+	try 
+	{
 		var request = http.request(options); 
 		request.end();
 		request.on('response', function(res) {
