@@ -128,15 +128,46 @@ var yt_player_queue = {}; //queues a video to play when the player is done initi
 var yt_player_progress_type = null; //0 = progress bar, 1 = slider
 var yt_player_progress_target;
 var yt_player_user_seeking = false;
+
 function init_youtube_player() {
-	// allowScriptAccess must be set to allow the Javascript from one 
-	// domain to access the swf on the youtube domain
-	var params = { allowScriptAccess:"always", bgcolor:"#cccccc", wmode:"transparent" };
-	// this sets the id of the object or embed tag to 'myytplayer'.
-	// You then use this id to access the swf and make calls to the player's API
-	var atts = { id: "myytplayer", wmode:"transparent" };
-	swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer&version=3", 
-		"ytapiplayer", "600", Math.floor(600*365/640), "8", null, null, params, atts);
+
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
+
+// This function creates an <iframe> (and YouTube player) after the API code downloads.
+var player;
+function onYouTubeIframeAPIReady() {
+	player = new YT.Player('player', {
+		height: Math.floor(600*365/640),
+		width: 600,
+		videoId: 'M7lc1UVf-VE',
+		events: {
+			'onReady': onPlayerReady,
+			'onStateChange': onPlayerStateChange
+		}
+	});
+}
+
+// The API will call this function when the video player is ready.
+function onPlayerReady(event) {
+	event.target.playVideo();
+}
+
+// The API calls this function when the player's state changes.
+//    The function indicates that when playing a video (state=1),
+//    the player should play for six seconds and then stop.
+function onPlayerStateChange(event) {
+	if (event.data == YT.PlayerState.PLAYING && !done) {
+		setTimeout(stopVideo, 6000);
+	}
+}
+      
+function stopVideo() {
+	player.stopVideo();
 }
 
 function onYouTubePlayerReady(x) {
