@@ -151,7 +151,7 @@ function onYouTubeIframeAPIReady() {
 			'onError': onYoutubePlayerError,
 		},
 		playerVars: { 
-			'autoplay': 1, 
+			'autoplay': 0, 
 			'controls': 0,
 			'fs' : 0,
 			'playsinline' : 1,
@@ -164,7 +164,6 @@ function onYouTubeIframeAPIReady() {
 
 }
 
-// The API will call this function when the video player is ready.
 function onPlayerReady(event) {
 	yt_player_ready = true;
 
@@ -221,10 +220,6 @@ function onPlayerStateChange(event) {
 
 }
       
-function stopVideo() {
-	yt_player.stopVideo();
-}
-
 function onYoutubePlayerError(code) {
 	var str = "Unknown error: "+code;
 	if(code == 2) str = "Invalid Youtube video ID.";
@@ -364,7 +359,8 @@ function player_stop() {
 function player_set_quality(q) {
 	if(q != undefined)
 		player_quality = q;
-	ytplayer.setPlaybackQuality(player_quality);
+	if (yt_player != undefined)
+		yt_player.setPlaybackQuality(player_quality);
 }
 
 function send_client_info() {
@@ -844,8 +840,6 @@ var curr_hash;
 function check_hash_change() {
 	if(window.location.hash != curr_hash) {
 		curr_hash = window.location.hash;
-		//alert("hash change to "+curr_hash); // "#!asdf"
-		//now what?
 		if((curr_hash.length == ROOM_ID_LEN+2 && curr_hash.charAt(1) == '!') || //is a room id
 		   (curr_hash.length >= 3 && curr_hash.charAt(1) == '_')) { //or is a channel id
 	
