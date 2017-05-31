@@ -710,15 +710,17 @@ function http_get(host, path, callback) {
 //cache_key is optional
 function http_get_nocache(host, path, callback, cache_key) {
 	debug("making external request..");
-	var options = {host:host, port:80, method:"GET", path:path}; //node.js .3 options data
-	var client = http.createClient(options.port, options.host); //node.js .2 request
-	var headers = {host:options.host};
+	var options = {
+		host:host, 
+		port:80, 
+		method:"GET", 
+		path:path
+	}; 
 	if(YOUTUBE_API_KEY != undefined && options.host.indexOf("gdata.youtube.com")!=-1) {
-		headers["X-GData-Key"] = "key=" + YOUTUBE_API_KEY;
 		debug("sending API key..");
 	}
 	try {
-		var request = client.request(options.method, options.path, headers);
+		var request = http.request(options); 
 		request.end();
 		request.on('response', function(res) {
 			res.setEncoding('utf8');
