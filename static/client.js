@@ -836,27 +836,22 @@ function search_youtube() {
 }
 
 function show_search_results(data) {
-	console.log("data" + data);
-        //if(data != undefined && data.items != undefined) {
-        	var items = data.data.items;
-console.log("items" + items);
-console.log("items[0]" + items[0]);
                 var html = "<table><tr>"; //oh god I am so sorry it came to this
-                for(var i in items) { console.log("entered loop");
-                	var item = items[i];
-                	var title = $('<span>').text(item.snippet.title).html(),
-                        	thumbnail = item.snippet.thumbnails.default.url,
-                        	id = item.id.videoId;
-                    	html += "<td><a href=\"#\" onclick=\"set_video('" + id + "');return false\" class=\"pane_item youtube_result\">" +
+                for(var item in data.items) { 
+                	var title = $('<span>').text(item.title).html(),
+                        	thumbnail = item.thumbnail,
+                        	id = item.id;
+                    	html += "<td><a href=\"#\" onclick=\"set_video('" + 
+				item.id + 
+				"');return false\" class=\"pane_item youtube_result\">" +
                         	"<div style=\"text-align:center\">" +
                         	"<img src=\"" + thumbnail + "\">" +
                         	"</div>" +
-                        	title + "</a></td>";
+                        	title + 
+				"</a></td>";
                 }
- console.log("exited loop");
                 html += "</tr></table>";
                 $("#search_youtube_results").html(html);
-	//}
 }
 
 var curr_hash;
