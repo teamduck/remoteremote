@@ -188,9 +188,9 @@ function onPlayerReady(event) {
         var duration = yt_player.getDuration();
         var value = 100 * current_time / duration;
         //calc the loaded bar
-        var total_bytes = ytplayer.getVideoBytesTotal();
-        var start_bytes = ytplayer.getVideoStartBytes();
-        var loaded_bytes = ytplayer.getVideoBytesLoaded();
+        var total_bytes = yt_player.getVideoBytesTotal();
+        var start_bytes = yt_player.getVideoStartBytes();
+        var loaded_bytes = yt_player.getVideoBytesLoaded();
         var loaded_percent = 0;
         var start_percent = 0;
         if(total_bytes != 0) {
@@ -223,7 +223,7 @@ function onPlayerReady(event) {
 
 // The API calls this function when the player's state changes.
 function onPlayerStateChange(event) {
-    if(event.data == yt_player.PlayerState.BUFFERING && !player_quality_set && false) { //is now a param in cuevideobyid
+    if(event.data == YT.PlayerState.BUFFERING && !player_quality_set && false) { //is now a param in cuevideobyid
         player_set_quality();
         player_quality_set = true;
     }
@@ -359,7 +359,7 @@ function player_change_state(play, start_time) {
 }
 
 function player_stop() {
-    if(!yt_player_ready) {
+    if(!yt_player_ready || yt_player === undefined || yt_player.stopVideo === undefined) {
         yt_player_queue = {};
         return;
     }
