@@ -837,15 +837,13 @@ function search_youtube() {
 
 function show_search_results(data) {
                 var html = "<table><tr>"; //oh god I am so sorry it came to this
-                for(var item in data.items) { 
-                	var title = $('<span>').text(item.title).html(),
-                        	thumbnail = item.thumbnail,
-                        	id = item.id;
+                for(var i in data.data) { 
+                	var title = "<span>" + data.data[i].title + "</span>";
                     	html += "<td><a href=\"#\" onclick=\"set_video('" + 
-				item.id + 
+				data.data[i].id + 
 				"');return false\" class=\"pane_item youtube_result\">" +
                         	"<div style=\"text-align:center\">" +
-                        	"<img src=\"" + thumbnail + "\">" +
+                        	"<img src=\"" + data.data[i].thumbnail + "\">" +
                         	"</div>" +
                         	title + 
 				"</a></td>";
