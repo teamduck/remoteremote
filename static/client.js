@@ -172,14 +172,16 @@ function onPlayerReady(event) {
     }
 
     player_build_controls();
-    var vol_label = $("#video_volume_label");
-    vol_label.text("vol: " + yt_player.getVolume() + "%");
-    $("#video_volume_slider")
-        .slider("option", "value", yt_player.getVolume())
-        .bind('slide', function (event, ui) {
-            yt_player.setVolume(ui.value);
-            vol_label.text("vol: " + yt_player.getVolume() + "%");
-        });
+    setTimeout(function() {
+        var vol_label = $("#video_volume_label");
+        vol_label.text("vol: " + yt_player.getVolume() + "%");
+        $("#video_volume_slider")
+            .slider("option", "value", yt_player.getVolume())
+            .bind('slide', function (event, ui) {
+                yt_player.setVolume(ui.value);
+                vol_label.text("vol: " + yt_player.getVolume() + "%");
+            });
+    }, 1000); // Race condition - quick fix
     setInterval(function () {
         //dont update if duration is 0 or no progress bar loaded or buffering
         var player_state = yt_player.getPlayerState();
