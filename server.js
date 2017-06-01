@@ -3,6 +3,7 @@
 //nMemcached = require('./3rd-Eden-node-memcached/nMemcached');
 
 http = require('http');
+https = require('https');
 crypto = require('crypto');
 url = require('url');
 querystring = require('querystring');
@@ -341,14 +342,15 @@ Room.prototype.set_video = function (video, info) {
             YOUTUBE_API_KEY;
         http_get(host, path, function (body, status_code) {
 
-            debug(body);
-            var title = "fake title"; //body.items[0].snippet.title
+            //debug(body);
+            var parsed = JSON.parse(body);
+            var title = parsed.items[0].snippet.title
 
             if(title == null) {
                 title = "[error fetching title]";
             }
             //find the duration
-            var duration = 60; //body.items[0].contentDetails.duration
+            var duration = parsed.items[0].contentDetails.duration;
             if(duration == null) {
                 duration = -1;
             }
@@ -368,7 +370,8 @@ Room.prototype.set_video = function (video, info) {
     }
 
     popular_rooms_changed = true;
-}
+};
+
 Room.prototype.video_seek = function (seconds, send_event) {
     if(!isdecimal(seconds) || seconds < 0 || seconds > this.video_duration || this.video_duration == -1) return;
     this.video_prev_elapsed_time = seconds;
@@ -461,6 +464,7 @@ Room.prototype.channel_get_videos = function (room) {
     else if(fetch_data.type == "user")
         path = "/feeds/api/users/" + fetch_data.user + "/uploads?start-index=" + start + "&max-results=" + max + "&v=2&alt=jsonc&format=5"
             + (fetch_data.orderby != undefined ? "&orderby=" + fetch_data.orderby : "");
+    /*
     http_get(
         "gdata.youtube.com",
         path,
@@ -489,7 +493,7 @@ Room.prototype.channel_get_videos = function (room) {
                 room.curr_fetch_num = 0;
                 setTimeout(room.channel_get_videos, was_cached ? 1 : Math.floor(Math.random() * 500 + 500), room);
             }
-        });
+        });*/
 }
 Room.prototype.channel_init_finish = function (room) {
     if(room.video_queue.length > 0) {
@@ -708,15 +712,15 @@ function http_get(host, path, callback) {
     debug("internal get: " + host + path);
     var cache_key = sha1(host + path) + sha1(path); //I dont know the chance of an sha1 collision
 
-    if(CACHE_TYPE == "memcache") {
+    if(CACHE_TYPE === "memcache") {
         mc.get(cache_key, function (err, result) {
-            if(err || result == false) return http_get_nocache(host, path, callback, cache_key);
+            if(err || result === undefined) return http_get_nocache(host, path, callback, cache_key);
             debug("got data from cache (" + (result + "").length + " bytes)");
 
             //if((result+"").length < 100) debug(result);
             callback(result, 200, true);
         });
-    } else if(CACHE_TYPE == "file") {
+    } else if(CACHE_TYPE === "file") {
         fs.stat("cache/" + cache_key, function (err, stats) {
             if(err) //file doesnt exist
                 return http_get_nocache(host, path, callback, cache_key);
@@ -740,15 +744,15 @@ function http_get_nocache(host, path, callback, cache_key) {
     debug("making external request..");
     var options = {
         host: host,
-        port: 80,
+        //port: 80,
         method: "GET",
         path: path
     };
-    if(YOUTUBE_API_KEY != undefined && options.host.indexOf("googleapis.com") != -1) {
-        debug("sending API key..");
-    }
+
     try {
-        var request = http.request(options);
+        // Since all outbound requests will be using HTTPS, disable HTTP path (at least for now)
+        //var request = http.request(options);
+        var request = https.request(options);
         request.end();
         request.on('response', function (res) {
             res.setEncoding('utf8');
@@ -996,14 +1000,20 @@ routes['msg'] = function (user, data) {
     room.send("msg", event_data/*, user.sess_id*/);
 
     //is this a video?
-    var matches = msg.match(/youtube\.com\/watch.*?v=([0-9a-zA-Z_-]+)/);
+    var matches = msg.match(/youtube\.com\/watch.*?v=([0-9a-zA-Z_-]{11})/);
+
+    // Also handle https://youtu.be/<id> format
+    if(matches === null) {
+        matches = msg.match(/youtu\.be\/([0-9a-zA-Z_-]{11})/);
+    }
+
     if(!room.is_channel && matches != null && matches[1] !== undefined) {
         if(room.user_with_remote != user.sess_id)
             user.send("no_remote");
         else
             room.set_video(matches[1]);
     }
-}
+};
 
 routes['change_name'] = function (user, data) {
     if(user.room === null) return;
