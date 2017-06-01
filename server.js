@@ -327,7 +327,8 @@ Room.prototype.set_video = function (video, info) {
     this.video_prev_elapsed_time = 0;
     this.video_paused = false;
 
-    if(info != undefined) {
+    // Deprecating this path as playlist API no longer returns duration
+    if(false && info != undefined) {
         if(this.num_users > 0)
             this.send("video_info", {title: info.title});
         this.video_title = info.title;
@@ -358,15 +359,15 @@ Room.prototype.set_video = function (video, info) {
             this_room.video_title = title;
             this_room.video_duration = duration;
             popular_rooms_changed = true;
+
+            this_room.clear_next_timeout();
+            if(this_room.is_channel && isnum(duration)) {
+                this_room.channel_next_timeout_id = setTimeout(this_room.video_next, (duration + VIDEO_AUTO_NEXT_QUEUE) * 1000, this_room); //next vid
+            }
         });
         /*.on('error', function(e) {
          this.send("video_title", {title:"[error fetching title]"});
          });*/
-    }
-
-    this.clear_next_timeout();
-    if(this.is_channel && isnum(info.duration)) {
-        this.channel_next_timeout_id = setTimeout(this.video_next, (info.duration + VIDEO_AUTO_NEXT_QUEUE) * 1000, this); //next vid
     }
 
     popular_rooms_changed = true;
@@ -419,7 +420,7 @@ Room.prototype.video_next = function (room) {
         room.channel_shuffle(room);
     }
     var item = room.video_queue[room.video_queue_index];
-    room.set_video(item.id, item);
+    room.set_video(item.id);
 }
 
 //returns: false if no video playing, else returns the time in seconds
@@ -441,7 +442,7 @@ Room.prototype.channel_init = function () {
 Room.prototype.channel_get_videos = function (room) {
     //debug(JSON.stringify(room));
     var fetch_data = room.channel_info.fetch[room.curr_fetch_i];
-    var vids_to_fetch = (fetch_data.count == undefined ? CHANNEL_VIDEOS : fetch_data.count);
+    var vids_to_fetch = (fetch_data.count === undefined ? CHANNEL_VIDEOS : fetch_data.count);
     var start = room.curr_fetch_num + room.queue_skipped_videos + 1,
         max = vids_to_fetch - room.curr_fetch_num;
     if(max <= 0) {
@@ -454,19 +455,44 @@ Room.prototype.channel_get_videos = function (room) {
             return setTimeout(room.channel_get_videos, Math.floor(Math.random() * 500 + 500), room);
         }
     }
-    //always send for 50, since some videos dont allow embedding, and it sucks to be searching for 1 over and over..
-    max = 50;
+
+
+    // Begin parsing the pre-set channel definitions
+    max = 50; // Max videos to fetch per page
+    var api_host = "www.googleapis.com";
     var path = "/";
-    if(fetch_data.type == "cat")
-        path = "/feeds/api/videos?category=" + fetch_data.cat + "&start-index=" + start + "&max-results=" + max + "&v=2&alt=jsonc&format=5";
-    else if(fetch_data.type == "query")
-        path = "/feeds/api/videos?q=" + fetch_data.q + "&start-index=" + start + "&max-results=" + max + "&v=2&alt=jsonc&format=5";
-    else if(fetch_data.type == "user")
-        path = "/feeds/api/users/" + fetch_data.user + "/uploads?start-index=" + start + "&max-results=" + max + "&v=2&alt=jsonc&format=5"
-            + (fetch_data.orderby != undefined ? "&orderby=" + fetch_data.orderby : "");
-    /*
-    http_get(
-        "gdata.youtube.com",
+    if(fetch_data.type === "cat") {
+        //path = "/feeds/api/videos?category=" + fetch_data.cat + "&start-index=" + start + "&max-results=" + max + "&v=2&alt=jsonc&format=5";
+        return; //todo
+    } else if(fetch_data.type === "query") {
+        //path = "/feeds/api/videos?q=" + fetch_data.q + "&start-index=" + start + "&max-results=" + max + "&v=2&alt=jsonc&format=5";
+        return; //todo
+    } else if(fetch_data.type === "user") { // This is for a YT username - NOT a channel ID
+        path = "/youtube/v3/channels?part=contentDetails&forUsername=" + fetch_data.user + "&key=" + YOUTUBE_API_KEY;
+        http_get(api_host, path, function (body, code, was_cached) {
+            var data = JSON.parse(body);
+            for(var i = 0; i < data.items.length; i++) {
+                var playlist_id = data.items[i].contentDetails.relatedPlaylists.uploads;
+                var playlist_path = "/youtube/v3/playlistItems?part=snippet&maxResults=" + max + "&playlistId=" + playlist_id + "&key=" + YOUTUBE_API_KEY;
+                http_get(api_host, playlist_path, function (body, code, was_cached) {
+                    var data = JSON.parse(body);
+                    for(var i = 0; i < data.items.length; i++) {
+                        var item = data.items[i];
+                        room.video_queue.push({id: item.snippet.resourceId.videoId, title: item.snippet.title});
+                    }
+
+                    room.channel_init_finish(room); // Should be adjusted to be the last thing that happens?
+                });
+
+            }
+        });
+    }
+
+    // Todo: re-enable fetching more than 50 results bu honoring the pageToken
+    // See: https://developers.google.com/apis-explorer/?hl=en_US#p/youtube/v3/youtube.playlistItems.list
+
+/*    http_get(
+        api_host,
         path,
         function (data, code, was_cached) {
             try {
@@ -512,7 +538,7 @@ Room.prototype.channel_init_finish = function (room) {
 
 
     var item = room.video_queue[0];
-    room.set_video(item.id, item);
+    room.set_video(item.id);
 }
 Room.prototype.channel_shuffle = function (room) {
     shuffle(room.video_queue);
