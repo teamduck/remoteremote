@@ -728,7 +728,7 @@ function handle_response(resp) {
         build_user_list();
         player_build_controls();
         set_room_title(room_title);
-        if(yourRemote) {
+        if(yourRemote && !is_channel) {
  	    $("#top_panel_labels").show();
 	    // open search for remote holder
             toggle_panel(4);
