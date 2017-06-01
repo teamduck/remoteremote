@@ -587,6 +587,7 @@ function handle_response(resp) {
         debug("recv event: " + event);
         debug(data);
     }
+
     // join room
     if(event == 'welcome') {
         yourSession = data.user.sess_id;
@@ -719,6 +720,7 @@ function handle_response(resp) {
     // remote
     else if(event == 'no_remote') {
         announce("You don't have the remote.", "red");
+        $("#top_panel_labels").hide()
     } else if(event == 'transfer_remote') {
         remoteSessId = data.sess_id;
         yourRemote = (remoteSessId == yourSession);
@@ -726,6 +728,18 @@ function handle_response(resp) {
         build_user_list();
         player_build_controls();
         set_room_title(room_title);
+        if(yourRemote) {
+ 	    $("#top_panel_labels").show();
+	    // open search for remote holder
+            toggle_panel(4);
+	}
+	else {
+	    // close search and hide if giving up remote
+    	    if(!yourRemote && curr_top_panel == 4) {
+        	toggle_panel(4);
+        	$("#top_panel_labels").hide();
+    	    }
+	}
     }
 
     // users
