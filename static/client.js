@@ -144,7 +144,6 @@ function onYouTubeIframeAPIReady() {
     yt_player = new YT.Player('player', {
         height: Math.floor(600 * 365 / 640),
         width: 600,
-        //videoId: 'M7lc1UVf-VE',
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
@@ -159,6 +158,7 @@ function onYouTubeIframeAPIReady() {
             'showinfo': 0,
             'enablejsapi': 1,
             'disablekb': 1,
+	    'iv_load_policy' : 3,
         },
     });
 
@@ -308,8 +308,6 @@ function player_build_controls() {
     }
 }
 
-//TODO
-// actually play it
 function player_put_video(id, start_time, play) {
     if(_player_put_timeout != undefined)
         clearTimeout(_player_put_timeout);
