@@ -1028,7 +1028,7 @@ function init() {
         $("<div style=\"text-align:left;font-size:12pt\">" +
             "<p>remoteremote.com is a site to share YouTube videos with friends. Create a room and share the link with your friends.</p>" +
             "<p>Don't know what to watch? Simply join a premade channel.</p>" +
-            "<p>remoteremote.com is a creation of Team Duck, coded by Sam (backend+frontend) and Greg (some of the frontend) and then James 7 years later</p>" +
+            "<p>remoteremote.com is a creation of Team Duck, coded by Sam (backend+frontend) and Greg (some of the frontend) and then James 7 years later.</p>" +
             "</div>").dialog({
             width: 600,
             modal: true,
