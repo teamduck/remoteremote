@@ -536,10 +536,7 @@ function sendMessage() {
                 send_event("give_remote", {to_sess_id: whom_sess_id});
             }
         } else if(text.indexOf("/help") == 0) {
-            announce("Paste a youtube link to play it.");
-            announce("Commands:");
-            announce("/name NAME - sets your user name to NAME");
-            announce("/give NAME - passes the remote to NAME");
+	    listCommands();
         } else {
             announce("Unknown command, use /help for a list.");
         }
@@ -554,6 +551,13 @@ function sendMessage() {
 
     // clear it
     $("#chat_entry").attr("value", "");
+}
+
+function listCommands() {
+        announce("Paste a youtube link to play it.");
+        announce("Commands:");
+        announce("/name NAME - sets your user name to NAME");
+	announce("/give NAME - passes the remote to NAME")
 }
 
 function set_video(x) {
@@ -749,6 +753,7 @@ function handle_response(resp) {
         users[data.sess_id] = data;
         user_list[data.sess_id] = true;
         build_user_list();
+	listCommands();
     } else if(event == 'user_leave') {
         announce(fancyName(data) + " left.");
         delete user_list[data.sess_id];
