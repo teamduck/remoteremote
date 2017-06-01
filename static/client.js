@@ -557,7 +557,7 @@ function sendMessage() {
     // clear it
     $("#chat_entry").attr("value", "");
 }
-//TODO
+
 function set_video(x) {
     send_event('msg', {msg: "http://youtube.com/watch?v=" + x});
 }
@@ -714,6 +714,10 @@ function handle_response(resp) {
         //actually, just listen for the change_name event
     }
 
+    else if(event == 'search_results') {
+	show_search_results(data);
+    }
+
     // remote
     else if(event == 'no_remote') {
         announce("You don't have the remote.", "red");
@@ -823,34 +827,36 @@ function toggle_panel(x) {
             $('#search_youtube_input').focus();
     }
 }
-//TODO
+
 function search_youtube() {
-    $.ajax({
-        type: "GET",
-        url: "http://gdata.youtube.com/feeds/api/videos",
-        data: {v: 2, "max-results": 20, alt: "jsonc", format: 5, q: $("#search_youtube_input").val()},
-        dataType: "jsonp",
-        success: function (data) {
-            if(data.data != undefined && data.data.items != undefined) {
-                var items = data.data.items;
+	send_event('search_youtube', {
+		query: $("#search_youtube_input").val(), 
+		client: yourSession
+	});
+}
+
+function show_search_results(data) {
+	console.log("data" + data);
+        //if(data != undefined && data.items != undefined) {
+        	var items = data.data.items;
+console.log("items" + items);
+console.log("items[0]" + items[0]);
                 var html = "<table><tr>"; //oh god I am so sorry it came to this
-                for(var i in items) {
-                    var item = items[i];
-                    var title = $('<span>').text(item.title).html(),
-                        thumbnail = item.thumbnail.sqDefault,
-                        id = item.id;
-                    html += "<td><a href=\"#\" onclick=\"set_video('" + id + "');return false\" class=\"pane_item youtube_result\">" +
-                        "<div style=\"text-align:center\">" +
-                        "<img src=\"" + thumbnail + "\">" +
-                        "</div>" +
-                        title + "</a></td>";
+                for(var i in items) { console.log("entered loop");
+                	var item = items[i];
+                	var title = $('<span>').text(item.snippet.title).html(),
+                        	thumbnail = item.snippet.thumbnails.default.url,
+                        	id = item.id.videoId;
+                    	html += "<td><a href=\"#\" onclick=\"set_video('" + id + "');return false\" class=\"pane_item youtube_result\">" +
+                        	"<div style=\"text-align:center\">" +
+                        	"<img src=\"" + thumbnail + "\">" +
+                        	"</div>" +
+                        	title + "</a></td>";
                 }
+ console.log("exited loop");
                 html += "</tr></table>";
                 $("#search_youtube_results").html(html);
-            }
-        }
-
-    });
+	//}
 }
 
 var curr_hash;
@@ -984,6 +990,7 @@ function init() {
     });
     socket.on('disconnect', socket_on_disconnect);
     socket.on('message', handle_response);
+
     //socket.connect();
     send_event("hello");
 

@@ -35,7 +35,6 @@ CACHE_TYPE = "memcache"; //can be "memcache", "file", or "none". this is where H
 USE_NONE_MATCH = true; //whether to use the If-None-Match http header
 LIMIT_MSGS_PER_SEC = 5;
 LIMIT_MAX_BUCKET_SIZE = 10;
-//api key is optional, set to undefined if unused
 YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || "";
 CHANNELS = {
     //lolcats:{title:"not funny", fetch:[{type:"cat", cat:"lolcat"}]},
@@ -118,7 +117,7 @@ BAD_WORDS = ["fuck", "bitch", "ass", "piss", "shit", "cock", "cunt", "tit", "boo
 //events to buffer and send to the client when they reconnect (local to the client only, stored inside User object)
 EVENTS_TO_BUFFER = ["welcome", "join_room_success", "join_room_error",
     "msg", "change_name", "transfer_remote", "user_join",
-    "user_leave", "video_info", "room_title_set"];
+    "user_leave", "video_info", "room_title_set", "search_youtube"];
 //events to buffer to display the user when they join the room (local to room, stored in room)
 ROOM_EVENTS_TO_BUFFER = ["msg", "change_name", "transfer_remote", "user_join", "user_leave", "video_info", "room_title_set"];
 ROOM_EVENTS_BUFFER_LEN = 100;
@@ -976,6 +975,23 @@ routes['join_room'] = function (user, data) {
     //put the user in the room
     room.add_user(user);
     room.sync(user);
+}
+
+routes['search_youtube'] = function (user, data) {
+	if(user.room === null) return;
+	var room = user.room;
+   
+        var host = "www.googleapis.com";
+        var path = "/youtube/v3/search?maxResults=20&part=snippet&q=" +
+            data.query +
+            "&key=" +
+            YOUTUBE_API_KEY;
+        http_get(host, path, function (body, status_code) {
+	
+    		user.send("search_results", {data: body});
+
+        });    
+
 }
 
 routes['leave_room'] = function (user, data) {
