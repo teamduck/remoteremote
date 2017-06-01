@@ -1047,7 +1047,7 @@ function init() {
         return false;
     });
     if(Math.random() < .5)
-        $("body").css("background-image", "url(http://i.imgur.com/9Pia8.jpg)");
+        $("body").css("background-image", "url(https://i.imgur.com/9Pia8.jpg)");
 }
 
 $(init);
