@@ -468,20 +468,27 @@ Room.prototype.channel_get_videos = function (room) {
     } else if(fetch_data.type === "user") { // This is for a YT username - NOT a channel ID
         path = "/youtube/v3/channels?part=contentDetails&forUsername=" + fetch_data.user + "&key=" + YOUTUBE_API_KEY;
         http_get(api_host, path, function (body, code, was_cached) {
-            var data = JSON.parse(body);
-            for(var i = 0; i < data.items.length; i++) {
-                var playlist_id = data.items[i].contentDetails.relatedPlaylists.uploads;
-                var playlist_path = "/youtube/v3/playlistItems?part=snippet&maxResults=" + max + "&playlistId=" + playlist_id + "&key=" + YOUTUBE_API_KEY;
-                http_get(api_host, playlist_path, function (body, code, was_cached) {
-                    var data = JSON.parse(body);
-                    for(var i = 0; i < data.items.length; i++) {
-                        var item = data.items[i];
-                        room.video_queue.push({id: item.snippet.resourceId.videoId, title: item.snippet.title});
-                    }
+            try {
+                var data = JSON.parse(body);
+                for(var i = 0; i < data.items.length; i++) {
+                    var playlist_id = data.items[i].contentDetails.relatedPlaylists.uploads;
+                    var playlist_path = "/youtube/v3/playlistItems?part=snippet&maxResults=" + max + "&playlistId=" + playlist_id + "&key=" + YOUTUBE_API_KEY;
+                    http_get(api_host, playlist_path, function (body, code, was_cached) {
+                        try {
+                            var data = JSON.parse(body);
+                            for(var i = 0; i < data.items.length; i++) {
+                                var item = data.items[i];
+                                room.video_queue.push({id: item.snippet.resourceId.videoId, title: item.snippet.title});
+                            }
 
-                    room.channel_init_finish(room); // Should be adjusted to be the last thing that happens?
-                });
-
+                            room.channel_init_finish(room); // Should be adjusted to be the last thing that happens?
+                        } catch(ex) {
+                            debug(ex);
+                        }
+                    });
+                }
+            } catch(ex) {
+                debug(ex);
             }
         });
     }

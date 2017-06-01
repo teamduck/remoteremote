@@ -974,11 +974,11 @@ function init() {
     //socket = new io.Socket("sam.no.de", {rememberTransport: false, transports:['websocket', 'flashsocket', 'htmlfile', 'xhr-multipart', 'xhr-polling']});
     socket = io.connect();
     socket.on('connect', function () {
-        announce("Connected via transport " + last_transport_attempted + ".");
-        $("#connection_status").text("Connected via " + last_transport_attempted + ".");
+        announce("Connected.");
+        $("#connection_status").text("Connected.");
     });
     socket.on('connecting', function (transport_type) {
-        $("#connection_status").text("Connecting via " + transport_type + "..");
+        $("#connection_status").text("Connecting..");
         last_transport_attempted = transport_type;
     });
     socket.on('disconnect', socket_on_disconnect);
