@@ -36,7 +36,7 @@ var alert_message_interval, alert_message_i;
 var popular_rooms_cache, last_popular_room_html, loaded_emoticons = {};
 var _player_put_timeout;
 var player_quality = "default", player_quality_set = false;
-var last_transport_attempted = "undefined";
+var last_transport_attempted = "<unknown>";
 
 var users = {}; //key is session id, value is User object (sess_id, name, color array)
 var user_list = {}; //key is session id, value is true
@@ -127,7 +127,7 @@ var yt_player_queue = {}; //queues a video to play when the player is done initi
 var yt_player_progress_type = null; //0 = progress bar, 1 = slider
 var yt_player_progress_target;
 var yt_player_user_seeking = false;
-var yt_player_ready = true;
+var yt_player_ready = false;
 
 function init_youtube_player() {
 
