@@ -400,7 +400,7 @@ function fancyName(user) {
     return "<span class=\"user " + user.color + " user_sess_" + user.sess_id + "\">" + user.name + "</span>";
 }
 
-function postMessage(user, text) {
+function addTextMessage(user, text) {
     //sanatize the text
     //text = escape(text);
     //not any more
@@ -667,7 +667,7 @@ function handle_response(resp) {
         $("#top_panel_5 .user_sess_" + yourSession).addClass("user_you");
         // messages
     } else if(event == 'msg') {
-        postMessage(data, data.msg);
+        addTextMessage(data, data.msg);
         //handle emoticons
         for(var i in data.emoticons) {
             var e = data.emoticons[i];
