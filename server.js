@@ -9,6 +9,7 @@ url = require('url');
 querystring = require('querystring');
 fs = require("fs");
 io = require('socket.io');
+moment = require('moment');
 try {
     gzip = require('gzip');
 } catch(e) {
@@ -351,10 +352,8 @@ Room.prototype.set_video = function (video, info) {
                 title = "[error fetching title]";
             }
             //find the duration
-            var duration = parsed.items[0].contentDetails.duration;
-            if(duration == null) {
-                duration = -1;
-            }
+            var duration = parse_iso8601_duration(parsed.items[0].contentDetails.duration);
+
             this_room.send("video_info", {title: title});
             this_room.video_title = title;
             this_room.video_duration = duration;
@@ -491,35 +490,35 @@ Room.prototype.channel_get_videos = function (room) {
     // Todo: re-enable fetching more than 50 results bu honoring the pageToken
     // See: https://developers.google.com/apis-explorer/?hl=en_US#p/youtube/v3/youtube.playlistItems.list
 
-/*    http_get(
-        api_host,
-        path,
-        function (data, code, was_cached) {
-            try {
-                var arr = JSON.parse(data);
-                var items = arr.data.items;
-                if(typeof(items) != "object") throw ""; //no results
-                //debug("got "+items.length+" items");
-                for(var i in items) {
-                    var e = items[i];
-                    if(typeof(e) != "object") continue;
-                    if(e.accessControl.embed == "allowed") {
-                        room.video_queue.push({id: e.id, title: e.title, duration: e.duration});
-                    } else {
-                        this.queue_skipped_videos++; //so we can calc the start-index properly
-                    }
-                    if(++room.curr_fetch_num >= vids_to_fetch) break;
-                }
-                setTimeout(room.channel_get_videos, was_cached ? 1 : Math.floor(Math.random() * 500 + 500), room);
-            } catch(ex) {
-                //debug("####################### uncleanly found all the vids for "+room.title+": "+ex);
-                if(++room.curr_fetch_i >= room.channel_info.fetch.length) //so we're at the end for this fetch, are there no more?
-                    return room.channel_init_finish(room);
-                room.queue_skipped_videos = 0;
-                room.curr_fetch_num = 0;
-                setTimeout(room.channel_get_videos, was_cached ? 1 : Math.floor(Math.random() * 500 + 500), room);
-            }
-        });*/
+    /*    http_get(
+     api_host,
+     path,
+     function (data, code, was_cached) {
+     try {
+     var arr = JSON.parse(data);
+     var items = arr.data.items;
+     if(typeof(items) != "object") throw ""; //no results
+     //debug("got "+items.length+" items");
+     for(var i in items) {
+     var e = items[i];
+     if(typeof(e) != "object") continue;
+     if(e.accessControl.embed == "allowed") {
+     room.video_queue.push({id: e.id, title: e.title, duration: e.duration});
+     } else {
+     this.queue_skipped_videos++; //so we can calc the start-index properly
+     }
+     if(++room.curr_fetch_num >= vids_to_fetch) break;
+     }
+     setTimeout(room.channel_get_videos, was_cached ? 1 : Math.floor(Math.random() * 500 + 500), room);
+     } catch(ex) {
+     //debug("####################### uncleanly found all the vids for "+room.title+": "+ex);
+     if(++room.curr_fetch_i >= room.channel_info.fetch.length) //so we're at the end for this fetch, are there no more?
+     return room.channel_init_finish(room);
+     room.queue_skipped_videos = 0;
+     room.curr_fetch_num = 0;
+     setTimeout(room.channel_get_videos, was_cached ? 1 : Math.floor(Math.random() * 500 + 500), room);
+     }
+     });*/
 }
 Room.prototype.channel_init_finish = function (room) {
     if(room.video_queue.length > 0) {
@@ -870,6 +869,14 @@ function _ep_str_matches(str) {
     if(temp == null) return null;
     matches[2] = temp[1];
     return matches;
+}
+
+function parse_iso8601_duration(duration) {
+    try {
+        return moment.duration(duration).asSeconds();
+    } catch(e) {
+        return -1;
+    }
 }
 
 

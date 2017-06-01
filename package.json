@@ -10,6 +10,7 @@
   "dependencies": {
     "dotenv": "^4.0.0",
     "memcached": "*",
+    "moment": "^2.18.1",
     "socketio": "*"
   },
   "repository": {
