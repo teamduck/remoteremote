@@ -16,6 +16,7 @@ try {
 
 nMemcached = require('memcached');
 //Constants = require('Constants');
+require('dotenv').config();
 Constants = {
 	"STATUS_AUTH_SHA1": "0",
 }
