@@ -846,7 +846,7 @@ function show_search_message(message) {
 }
 
 function show_search_results(data) {
-	if (data.data.length < 1) {
+	if (data == undefined || data.data == undefined || data.data.length < 1) {
 		show_search_results("No results found.");
 	}
 	else {
