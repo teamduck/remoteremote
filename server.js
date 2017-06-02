@@ -990,24 +990,29 @@ routes['search_youtube'] = function (user, data) {
    
         var host = "www.googleapis.com";
         var path = "/youtube/v3/search?maxResults=5&part=snippet&q=" +
-            data.query +
+            encodeURI(data.query) +
             "&key=" +
             YOUTUBE_API_KEY;
-        http_get(host, path, function (body, status_code) {
-		var results = [];
-        	var data = JSON.parse(body);
-		for(var i = 0; i < data.items.length; i++) {
-       		        var item = data.items[i];
-                        results.push({
-				id: item.id.videoId, 
-				title: item.snippet.title,
-				thumbnail: item.snippet.thumbnails.default.url
-			});
-                }
+	results = [];
+	try {
+        	http_get(host, path, function (body, status_code) {
+        		var data = JSON.parse(body);
+			for(var i = 0; i < data.items.length; i++) {
+       		        	var item = data.items[i];
+                        	results.push({
+					id: item.id.videoId, 
+					title: item.snippet.title,
+					thumbnail: item.snippet.thumbnails.default.url
+				});
+                	}
+		});
+	}
+	catch(error) {
+		//do nothing
+	}
 
-    		user.send("search_results", {data: results});
+    	user.send("search_results", {data: results});
 
-        });    
 
 }
 
