@@ -536,7 +536,10 @@ function sendMessage() {
                 send_event("give_remote", {to_sess_id: whom_sess_id});
             }
         } else if(text.indexOf("/help") == 0) {
-	    listCommands();
+            announce("Paste a youtube link to play it.");
+            announce("Commands:");
+            announce("/name NAME - sets your user name to NAME");
+            announce("/give NAME - passes the remote to NAME");
         } else {
             announce("Unknown command, use /help for a list.");
         }
@@ -551,13 +554,6 @@ function sendMessage() {
 
     // clear it
     $("#chat_entry").attr("value", "");
-}
-
-function listCommands() {
-        announce("Paste a youtube link to play it.");
-        announce("Commands:");
-        announce("/name NAME - sets your user name to NAME");
-	announce("/give NAME - passes the remote to NAME")
 }
 
 function set_video(x) {
@@ -591,7 +587,6 @@ function handle_response(resp) {
         debug("recv event: " + event);
         debug(data);
     }
-
     // join room
     if(event == 'welcome') {
         yourSession = data.user.sess_id;
@@ -717,6 +712,10 @@ function handle_response(resp) {
         //actually, just listen for the change_name event
     }
 
+    else if(event == 'search_message') {
+	show_search_message(data.data);
+    }
+
     else if(event == 'search_results') {
 	show_search_results(data);
     }
@@ -724,7 +723,6 @@ function handle_response(resp) {
     // remote
     else if(event == 'no_remote') {
         announce("You don't have the remote.", "red");
-        $("#top_panel_labels").hide()
     } else if(event == 'transfer_remote') {
         remoteSessId = data.sess_id;
         yourRemote = (remoteSessId == yourSession);
@@ -732,18 +730,6 @@ function handle_response(resp) {
         build_user_list();
         player_build_controls();
         set_room_title(room_title);
-        if(yourRemote && !is_channel) {
- 	    $("#top_panel_labels").show();
-	    // open search for remote holder
-            toggle_panel(4);
-	}
-	else {
-	    // close search and hide if giving up remote
-    	    if(!yourRemote && curr_top_panel == 4) {
-        	toggle_panel(4);
-        	$("#top_panel_labels").hide();
-    	    }
-	}
     }
 
     // users
@@ -753,7 +739,6 @@ function handle_response(resp) {
         users[data.sess_id] = data;
         user_list[data.sess_id] = true;
         build_user_list();
-	listCommands();
     } else if(event == 'user_leave') {
         announce(fancyName(data) + " left.");
         delete user_list[data.sess_id];
@@ -850,9 +835,21 @@ function search_youtube() {
 		query: $("#search_youtube_input").val(), 
 		client: yourSession
 	});
+	show_search_message("Loading...");
+}
+
+function show_search_message(message) {
+                var html = "<span class='notice'>" +
+			message +
+			"</span>";
+                $("#search_youtube_results").html(html);
 }
 
 function show_search_results(data) {
+	if (data.data.length < 1) {
+		show_search_results("No results found.");
+	}
+	else {
                 var html = "<table><tr>"; //oh god I am so sorry it came to this
                 for(var i in data.data) { 
                 	var title = "<span>" + data.data[i].title + "</span>";
@@ -867,6 +864,7 @@ function show_search_results(data) {
                 }
                 html += "</tr></table>";
                 $("#search_youtube_results").html(html);
+	}
 }
 
 var curr_hash;
