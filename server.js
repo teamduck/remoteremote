@@ -989,38 +989,40 @@ routes['search_youtube'] = function (user, data) {
 	var room = user.room;
 
 	var query = encodeURIComponent(data.query);
-	if (typeof(data.query === 'string') && query.length > 0 && query.length < 101) {
-        	var host = "www.googleapis.com";
-        	var path = "/youtube/v3/search?maxResults=5&part=snippet&q=" +
-            		data.query +
-            		"&key=" +
-            		YOUTUBE_API_KEY;
 
-		var results = [];
 
-		try {
-        		http_get(host, path, function (body, status_code) {
-        			var data = JSON.parse(body);
-				for(var i = 0; i < data.items.length; i++) {
-       		        		var item = data.items[i];
-                        		results.push({
-						id: item.id.videoId, 
-						title: item.snippet.title,
-						thumbnail: item.snippet.thumbnails.default.url
-					});
-                		}
-    				user.send("search_results", {data: results});
-		
-        		});    
-		}         
-                catch(error) {
-                        debug("Search error: " + error);
-			user.send("search_message", {data: "Youtube had a problem searching, try again."});
-                }      
+	
+	if (typeof(data.query !== query) || query.length < 1 || query.length > 100) {
+		user.send("search_message", {data: "Search must be between 1 and 100 characters"});
 	}
-	else {
-        	user.send("search_message", {data: "Search must be between 1 and 100 characters"});
-        }
+	
+        var host = "www.googleapis.com";
+        var path = "/youtube/v3/search?maxResults=5&part=snippet&q=" +
+            	query +
+            	"&key=" +
+            	YOUTUBE_API_KEY;
+
+	var results = [];
+
+	try {
+        	http_get(host, path, function (body, status_code) {
+        		var data = JSON.parse(body);
+			for(var i = 0; i < data.items.length; i++) {
+       		       		var item = data.items[i];
+                       		results.push({
+					id: item.id.videoId, 
+					title: item.snippet.title,
+					thumbnail: item.snippet.thumbnails.default.url
+				});
+                	}
+    			user.send("search_results", {data: results});
+		
+        	});    
+	}         
+        catch(error) {
+        	debug("Search error: " + error);
+		user.send("search_message", {data: "Youtube had a problem searching, try again."});
+        }      
 
 }
 
