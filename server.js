@@ -993,6 +993,7 @@ routes['search_youtube'] = function (user, data) {
 
 	if (typeof query !== "string" || query.length < 1 || query.length > SEARCH_YOUTUBE_MAX_CHARACTERS) {
 		user.send("search_message", {data: "Search must be between 1 and 100 characters"});
+		return;
 	}
 	
         var host = "www.googleapis.com";
@@ -1018,7 +1019,7 @@ routes['search_youtube'] = function (user, data) {
 		}
 		catch(error) {
                 	debug("Search error: " + error);
-                	user.send("search_message", {data: "The Youtube search API may be down, please try again."});
+                	user.send("search_message", {data: "Sorry, there was a problem searching. Please try again later."});
 		
 		}
         });    
