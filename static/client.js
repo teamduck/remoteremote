@@ -852,7 +852,7 @@ function show_search_results(data) {
 	else {
                 var html = "<table><tr>"; //oh god I am so sorry it came to this
                 for(var i in data.data) { 
-                	var title = "<span>" + data.data[i].title + "</span>";
+                	var title = $('<span>').text(data.data[i].title).html()
                     	html += "<td><a href=\"#\" onclick=\"set_video('" + 
 				data.data[i].id + 
 				"');return false\" class=\"pane_item youtube_result\">" +
@@ -1045,7 +1045,7 @@ function init() {
         $("<div style=\"text-align:left;font-size:12pt\">" +
             "<p>remoteremote.com is a site to share YouTube videos with friends. Create a room and share the link with your friends.</p>" +
             "<p>Don't know what to watch? Simply join a premade channel.</p>" +
-            "<p>remoteremote.com is a creation of Team Duck, coded by Sam (backend+frontend) and Greg (some of the frontend) and then James 7 years later.</p>" +
+            "<p>remoteremote.com is a creation of Team Duck, coded by Sam (backend+frontend) and Greg (some of the frontend) and then James seven years later.</p>" +
             "</div>").dialog({
             width: 600,
             modal: true,

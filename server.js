@@ -35,6 +35,7 @@ CACHE_TYPE = "memcache"; //can be "memcache", "file", or "none". this is where H
 USE_NONE_MATCH = true; //whether to use the If-None-Match http header
 LIMIT_MSGS_PER_SEC = 5;
 LIMIT_MAX_BUCKET_SIZE = 10;
+SEARCH_YOUTUBE_MAX_CHARACTERS = 100;
 YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || "";
 CHANNELS = {
     //lolcats:{title:"not funny", fetch:[{type:"cat", cat:"lolcat"}]},
@@ -988,27 +989,25 @@ routes['search_youtube'] = function (user, data) {
 	if(user.room === null) return;
 	var room = user.room;
 
-	var query = encodeURIComponent(data.query);
+	query = data.query.trim();
 
-
-	
-	if (typeof(data.query !== query) || query.length < 1 || query.length > 100) {
+	if (typeof query !== "string" || query.length < 1 || query.length > SEARCH_YOUTUBE_MAX_CHARACTERS) {
 		user.send("search_message", {data: "Search must be between 1 and 100 characters"});
 	}
 	
         var host = "www.googleapis.com";
         var path = "/youtube/v3/search?maxResults=5&part=snippet&q=" +
-            	query +
+            	encodeURIComponent(query) +
             	"&key=" +
             	YOUTUBE_API_KEY;
 
 	var results = [];
 
-	try {
-        	http_get(host, path, function (body, status_code) {
+        http_get(host, path, function (body, status_code) {
+		try {
         		var data = JSON.parse(body);
 			for(var i = 0; i < data.items.length; i++) {
-       		       		var item = data.items[i];
+				var item = data.items[i];
                        		results.push({
 					id: item.id.videoId, 
 					title: item.snippet.title,
@@ -1016,13 +1015,13 @@ routes['search_youtube'] = function (user, data) {
 				});
                 	}
     			user.send("search_results", {data: results});
+		}
+		catch(error) {
+                	debug("Search error: " + error);
+                	user.send("search_message", {data: "The Youtube search API may be down, please try again."});
 		
-        	});    
-	}         
-        catch(error) {
-        	debug("Search error: " + error);
-		user.send("search_message", {data: "Youtube had a problem searching, try again."});
-        }      
+		}
+        });    
 
 }
 
