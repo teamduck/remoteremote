@@ -833,7 +833,6 @@ function toggle_panel(x) {
 function search_youtube() {
 	send_event('search_youtube', {
 		query: $("#search_youtube_input").val(), 
-		client: yourSession
 	});
 	show_search_message("Loading...");
 }
