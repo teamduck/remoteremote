@@ -35,7 +35,7 @@ CACHE_TYPE = "memcache"; //can be "memcache", "file", or "none". this is where H
 USE_NONE_MATCH = true; //whether to use the If-None-Match http header
 LIMIT_MSGS_PER_SEC = 5;
 LIMIT_MAX_BUCKET_SIZE = 10;
-//api key is optional, set to undefined if unused
+SEARCH_YOUTUBE_MAX_CHARACTERS = 100;
 YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || "";
 CHANNELS = {
     //lolcats:{title:"not funny", fetch:[{type:"cat", cat:"lolcat"}]},
@@ -118,7 +118,7 @@ BAD_WORDS = ["fuck", "bitch", "ass", "piss", "shit", "cock", "cunt", "tit", "boo
 //events to buffer and send to the client when they reconnect (local to the client only, stored inside User object)
 EVENTS_TO_BUFFER = ["welcome", "join_room_success", "join_room_error",
     "msg", "change_name", "transfer_remote", "user_join",
-    "user_leave", "video_info", "room_title_set"];
+    "user_leave", "video_info", "room_title_set", "search_youtube"];
 //events to buffer to display the user when they join the room (local to room, stored in room)
 ROOM_EVENTS_TO_BUFFER = ["msg", "change_name", "transfer_remote", "user_join", "user_leave", "video_info", "room_title_set"];
 ROOM_EVENTS_BUFFER_LEN = 100;
@@ -983,6 +983,52 @@ routes['join_room'] = function (user, data) {
     //put the user in the room
     room.add_user(user);
     room.sync(user);
+}
+
+routes['search_youtube'] = function (user, data) {
+	if(user.room === null) return;
+	var room = user.room;
+
+	if (typeof data.query !== "string" || data.query.length < 1) {
+		user.send("search_message", {data: "Please enter a search query."});
+		return;
+	}
+	
+	if (data.query.length > SEARCH_YOUTUBE_MAX_CHARACTERS) {
+		user.send("search_message", {data: "Search must be between 1 and 100 characters."});
+		return;
+	}
+	
+	query = data.query.trim();
+	
+        var host = "www.googleapis.com";
+        var path = "/youtube/v3/search?maxResults=5&part=snippet&q=" +
+            	encodeURIComponent(query) +
+            	"&key=" +
+            	YOUTUBE_API_KEY;
+
+	var results = [];
+
+        http_get(host, path, function (body, status_code) {
+		try {
+        		var data = JSON.parse(body);
+			for(var i = 0; i < data.items.length; i++) {
+				var item = data.items[i];
+                       		results.push({
+					id: item.id.videoId, 
+					title: item.snippet.title,
+					thumbnail: item.snippet.thumbnails.default.url
+				});
+                	}
+    			user.send("search_results", {data: results});
+		}
+		catch(error) {
+                	debug("Search error: " + error);
+                	user.send("search_message", {data: "Sorry, there was a problem searching. Please try again later."});
+		
+		}
+        });    
+
 }
 
 routes['leave_room'] = function (user, data) {
