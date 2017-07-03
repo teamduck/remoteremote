@@ -989,12 +989,17 @@ routes['search_youtube'] = function (user, data) {
 	if(user.room === null) return;
 	var room = user.room;
 
-	query = data.query.trim();
-
-	if (typeof query !== "string" || query.length < 1 || query.length > SEARCH_YOUTUBE_MAX_CHARACTERS) {
-		user.send("search_message", {data: "Search must be between 1 and 100 characters"});
+	if (typeof data.query !== "string" || data.query.length < 1) {
+		user.send("search_message", {data: "Please enter a search query."});
 		return;
 	}
+	
+	if (data.query.length > SEARCH_YOUTUBE_MAX_CHARACTERS) {
+		user.send("search_message", {data: "Search must be between 1 and 100 characters."});
+		return;
+	}
+	
+	query = data.query.trim();
 	
         var host = "www.googleapis.com";
         var path = "/youtube/v3/search?maxResults=5&part=snippet&q=" +
