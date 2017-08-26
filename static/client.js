@@ -536,10 +536,7 @@ function sendMessage() {
                 send_event("give_remote", {to_sess_id: whom_sess_id});
             }
         } else if(text.indexOf("/help") == 0) {
-            announce("Paste a youtube link to play it.");
-            announce("Commands:");
-            announce("/name NAME - sets your user name to NAME");
-            announce("/give NAME - passes the remote to NAME");
+            listCommands();
         } else {
             announce("Unknown command, use /help for a list.");
         }
@@ -554,6 +551,14 @@ function sendMessage() {
 
     // clear it
     $("#chat_entry").attr("value", "");
+}
+
+function listCommands() {
+    announce("Paste a youtube link to play it.");
+    announce("Commands:");
+    announce("/name NAME - sets your user name to NAME");
+    announce("/give NAME - passes the remote to NAME");
+
 }
 
 function set_video(x) {
@@ -723,6 +728,7 @@ function handle_response(resp) {
     // remote
     else if(event == 'no_remote') {
         announce("You don't have the remote.", "red");
+        $("#top_panel_labels").hide();
     } else if(event == 'transfer_remote') {
         remoteSessId = data.sess_id;
         yourRemote = (remoteSessId == yourSession);
@@ -730,6 +736,18 @@ function handle_response(resp) {
         build_user_list();
         player_build_controls();
         set_room_title(room_title);
+        if(yourRemote && !is_channel) {
+	    $("#top_panel_labels").show();
+            // open search for remote holder
+            toggle_panel(4);
+        }
+        else {
+            // close search and hide if giving up remote
+	    if(!yourRemote && curr_top_panel == 4) {
+                toggle_panel(4);
+                $("#top_panel_labels").hide();
+            }
+        }
     }
 
     // users
@@ -739,6 +757,7 @@ function handle_response(resp) {
         users[data.sess_id] = data;
         user_list[data.sess_id] = true;
         build_user_list();
+        listCommands();
     } else if(event == 'user_leave') {
         announce(fancyName(data) + " left.");
         delete user_list[data.sess_id];
@@ -833,6 +852,7 @@ function toggle_panel(x) {
 function search_youtube() {
 	send_event('search_youtube', {
 		query: $("#search_youtube_input").val(), 
+                client: yourSession
 	});
 	show_search_message("Loading...");
 }
